@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>Welcome to the Home Page</h1>
+
+    <div class="catalog">
+        {% if books %}
+                    {% for book in books %}
+                        <div class="book-container">
+                            <strong>Title:</strong> {{ book.title }}<br>
+                            <strong>Author:</strong> {{ book.author }}<br>
+                            <strong>Abstract:</strong> {{ book.abstract }}<br>
+                            <strong>Publication Date:</strong> {{ book.publication_date }}<br>
+                            
+                            {% if book.image_url %}
+                                <strong>Image:</strong> <img class="book-image" src="{{ book.image_url }}" alt="{{ book.title }} Image"><br>
+                            {% endif %}
+                        </div>
+
+                    {% endfor %}
+
+        {% else %}
+            <p>No books available.</p>
+        {% endif %}
+
+    </div>
+
+
+{% endblock %}

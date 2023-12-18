@@ -1,0 +1,162 @@
+/* Add your custom styles here */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+body {
+    font-family: 'Arial', sans-serif;
+    height: 100%;
+}
+
+nav {
+    position: fixed;
+    width: 100vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    padding: 15px 40px;
+
+}
+
+.nav-title{
+    font-size: 24px;
+}
+
+.links-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.link{
+    text-decoration: none;
+    font-size: 22px;
+    color: white;
+}
+
+.nav-btn{
+    border: 1px solid white;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+.page-container{
+    height: auto;
+    box-sizing: border-box;
+    background-color: rgb(240,240,240);
+}
+
+.form-page-container{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 40px 30px;
+}
+
+#register-form{
+    min-width: 600px;
+}
+
+#addbook-form{
+    min-width: 700px;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-container{
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.input-container input{
+    width: 70%;
+    padding: 10px;
+
+}
+
+.input-container textarea{
+    width: 70%;
+    height: 100px;
+    padding: 10px;
+
+}
+
+.btn{
+    width: 50%;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-weight: bold;
+    font-size: 18px;
+    align-self: flex-end;
+    cursor: pointer;
+}
+
+.catalog{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-top: 50px;
+    background-color: rgb(240,240,240);
+}
+.book-container{
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+
+}
+
+.book-image{
+    width: 225px;
+    height: 300px;
+    object-fit: cover;
+    align-self: center;
+}
+
+.error-container{
+    margin-top: 20px;
+    color: red;
+    font-weight: bold;
+    font-size: 16px;
+}
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Add more styles as needed */
