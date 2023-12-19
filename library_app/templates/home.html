@@ -1,22 +1,61 @@
 {% extends 'base.html' %}
+{% load static %}
+
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1>Welcome to the Home Page</h1>
+    <h1 class="home-title">Welcome to The Open Source Library</h1>
+
+    <div class="header-container">
+
+        <img src="{% static 'library_app/header.svg' %}" alt="header" class="header-image">
+
+        <div class="text-container">
+            <h3>Unlock the Power of Knowledge, Embrace Freedom </h3>
+            <p>At The Open Source Library, we believe that access to knowledge should be a fundamental right, unrestricted by barriers. Our mission is to foster a community where learning knows no bounds. Explore a vast collection of PDF books across genres, all available for free, because knowledge is meant to be shared.</p>
+            <h3>Embracing Open Source for a Free Mind Society</h3>
+            <p>In a world driven by information, open source principles pave the way for a society that thrives on the free exchange of ideas. The Open Source Library celebrates the spirit of openness, encouraging a collective pursuit of enlightenment. Here, every book is a gateway to new horizons, and every download contributes to a culture of shared wisdom.</p>
+            <p>Join us on a journey where knowledge knows no bounds. Let The Open Source Library be your gateway to a world of limitless learning. Start exploring, start sharing, and together, let's build a future where information is free for all.</p>
+            <a class="btn" id="header-btn" href="{% url 'register' %}">Sign Up (for free)</a>    
+        </div>
+    </div>
+    
+    <h2 class="section-title">Our Catalog</h2>
 
     <div class="catalog">
         {% if books %}
                     {% for book in books %}
                         <div class="book-container">
-                            <strong>Title:</strong> {{ book.title }}<br>
-                            <strong>Author:</strong> {{ book.author }}<br>
-                            <strong>Abstract:</strong> {{ book.abstract }}<br>
-                            <strong>Publication Date:</strong> {{ book.publication_date }}<br>
-                            
-                            {% if book.image_url %}
-                                <strong>Image:</strong> <img class="book-image" src="{{ book.image_url }}" alt="{{ book.title }} Image"><br>
+
+                            <div class="book-cover">
+                                {% if book.image_url %}
+                                    <img class="book-image" src="{{ book.image_url }}" alt="{{ book.title }} Image">
+                                {% endif %}    
+                            </div>
+
+                            <div class="book-info">
+                                <p class="title">{{ book.title }}</p>
+                                <p class="author"><strong>Author: </strong>{{ book.author }}</p>
+                                <p class="publication-date"><strong>Publication Date: </strong>{{ book.publication_date }}</p>
+                                <div class="abstract">
+                                    <strong>Abstract: </strong>
+                                    <span class="short-abstract">{{ book.abstract|slice:":150" }}</span>
+                                    {% if book.abstract|length > 150 %}
+                                        <button class="see-more-btn">See More...</button>
+                                    {% endif %}
+                                    <span class="full-abstract" style="display: none;">{{ book.abstract }}</span>
+                                </div>
+                            </div>
+
+                            {% if book.borrower %}
+                                <p class="availability">Not Available</p>
+                            {% else %}
+                                {% if user.is_authenticated and not user.is_superuser %}
+                                    <button class="borrow-btn" data-book-id="{{ book.id }}">Borrow</button>
+                                {% endif %}
                             {% endif %}
+                            
 
                             {% if user.is_authenticated and user.is_superuser %}
                             <div class="superuser-actions">
@@ -35,5 +74,113 @@
 
     </div>
 
+    <!-- Modal for book details -->
+    <div id="myModal" class="modal-container">
+        <div class="modal-bg-layer"></div>
+        
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            
+            <img class="modal-image" alt="Book Image">
 
+            <div class="modal-book-info">
+                <h2 class="modal-title"></h2>
+                <p class="modal-author"></p>
+                <p class="full-abstract-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for borrow success -->
+    <div id="borrowSuccessModal" class="modal-container">
+        <div class="modal-bg-layer"></div>
+
+        <div class="modal-content success-modal">
+            <span id="closeSuccessModal" class="close-btn">&times;</span>
+            <p>You just borrowed the following book: <span id="successBookName"></span></p>
+        </div>
+    </div>
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var seeMoreButtons = document.querySelectorAll('.see-more-btn');
+            var modal = document.getElementById('myModal');
+            var closeModal = document.querySelector('.close-btn');
+            var fullAbstractText = document.querySelector('.full-abstract-text');
+            var modalTitle = document.querySelector('.modal-title');
+            var modalImage = document.querySelector('.modal-image');
+            var modalAuthor = document.querySelector('.modal-author');
+    
+            seeMoreButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var bookContainer = button.closest('.book-container');
+                    var title = bookContainer.querySelector('.title').textContent;
+                    var image = bookContainer.querySelector('.book-image').src;
+                    var author = bookContainer.querySelector('.author').textContent;
+                    var abstractContainer = bookContainer.querySelector('.abstract');
+                    var fullAbstract = abstractContainer.querySelector('.full-abstract').textContent;
+    
+                    modal.style.visibility = 'visible';
+                    modalTitle.textContent = title;
+                    modalImage.src = image;
+                    modalAuthor.textContent = author;
+                    fullAbstractText.textContent = fullAbstract;
+                });
+            });
+    
+            closeModal.addEventListener('click', function () {
+                modal.style.visibility = 'hidden';
+            });
+    
+            window.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    modal.style.visibility = 'hidden';
+                }
+            });
+            var borrowButtons = document.querySelectorAll('.borrow-btn');
+            var borrowSuccessModal = document.getElementById('borrowSuccessModal');
+            var successBookName = document.getElementById('successBookName');
+
+            borrowButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var bookId = button.dataset.bookId;
+
+                    // Send a request to the server to update the book's borrower field
+                    fetch('/borrow_book/' + bookId + '/')
+                        .then(response => {
+                            if (response.ok) {
+                                // Book borrowed successfully, update UI
+                                button.style.display = 'none';
+                                var bookContainer = button.closest('.book-container');
+                                var availability = document.createElement('p');
+                                availability.className = 'availability';
+                                availability.textContent = 'Not Available';
+                                bookContainer.appendChild(availability);
+
+                                // Display borrow success modal
+                                borrowSuccessModal.style.visibility = 'visible';
+                                successBookName.textContent = bookContainer.querySelector('.title').textContent;
+                            } else {
+                                // Handle error
+                                response.json().then(data => {
+                                    console.error('Failed to borrow book:', data.message);
+                                    // Optionally, display an error message to the user
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
+            });
+
+            // Close the success modal when clicking on the close button
+            var closeSuccessModal = document.getElementById('closeSuccessModal');
+            closeSuccessModal.addEventListener('click', function () {
+                borrowSuccessModal.style.visibility = 'hidden';
+            });
+        });
+    </script> 
+    
 {% endblock %}

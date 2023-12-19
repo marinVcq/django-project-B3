@@ -8,6 +8,10 @@ class Book(models.Model):
     abstract = models.TextField()
     publication_date = models.TextField()
     image_url = models.URLField()
+    borrower = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 
     def __str__(self):
         return self.title

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+    <h1>Welcome to Your Dashboard, {{ user.username }}!</h1>
+
+    <h2>Your Borrowed Books:</h2>
+    {% if user_borrowed_books %}
+        <ul>
+            {% for book in user_borrowed_books %}
+                <li>
+                    {{ book.title }} by {{ book.author }}
+                    <a href="{% url 'release_book' book.id %}">Release</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You haven't borrowed any books yet.</p>
+    {% endif %}
+{% endblock %}

@@ -1,11 +1,34 @@
 from django.shortcuts import render,get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import user_passes_test
 from .forms import BookForm
+from django.http import JsonResponse
 from .models import Book
 import requests
+
+@login_required
+def user_dashboard(request):
+    user_borrowed_books = Book.objects.filter(borrower=request.user)
+    return render(request, 'user_dashboard.html', {'user_borrowed_books': user_borrowed_books})
+
+@login_required
+def release_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id, borrower=request.user)
+    book.borrower = None
+    book.save()
+    return redirect('user_dashboard')
+
+def borrow_book(request, book_id):
+    if request.user.is_authenticated:
+        book = get_object_or_404(Book, id=book_id, borrower=None)
+        book.borrower = request.user
+        book.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'message': 'User not authenticated'}, status=401)
 
 def is_superuser(user):
     return user.is_superuser
