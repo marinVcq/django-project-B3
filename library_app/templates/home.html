@@ -17,6 +17,14 @@
                             {% if book.image_url %}
                                 <strong>Image:</strong> <img class="book-image" src="{{ book.image_url }}" alt="{{ book.title }} Image"><br>
                             {% endif %}
+
+                            {% if user.is_authenticated and user.is_superuser %}
+                            <div class="superuser-actions">
+                                <a class="book-action-btn" href="{% url 'edit_book' book.id %}">Edit</a>
+                                <a class="book-action-btn" href="{% url 'delete_book' book.id %}">Delete</a>
+                            </div>
+                            {% endif %}
+                            
                         </div>
 
                     {% endfor %}

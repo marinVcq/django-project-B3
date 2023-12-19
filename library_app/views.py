@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render,get_object_or_404, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login, logout as auth_logout
@@ -30,6 +30,35 @@ def add_book(request):
         return redirect('home')
 
     return render(request, 'add_book.html')
+
+@user_passes_test(is_superuser)
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+
+    if request.method == 'POST':
+        # Update the book fields based on the form data
+        book.author = request.POST.get('author')
+        book.title = request.POST.get('title')
+        book.abstract = request.POST.get('abstract')
+        book.publication_date = request.POST.get('publication_date')
+        book.image_url = request.POST.get('image_url')
+
+        # Save the updated book
+        book.save()
+
+        return redirect('home')
+    else:
+        return render(request, 'edit_book.html', {'book': book})
+
+@user_passes_test(is_superuser)
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+
+    if request.method == 'POST':
+        book.delete()
+        return redirect('home')
+
+    return render(request, 'delete_book.html', {'book': book})
 
 def home(request):
     books = Book.objects.all()
